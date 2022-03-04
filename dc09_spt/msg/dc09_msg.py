@@ -70,7 +70,7 @@ class dc09_msg:
         """
         def calc_crc(crc, debyte):
             deze = ord(debyte)
-            for i in range(0, 8):
+            for _ in range(8):
                 deze ^= crc & 1
                 crc >>= 1
                 if deze & 1:
@@ -88,9 +88,9 @@ class dc09_msg:
         """
         crypt = ''
         pad = (len(data) + 21) % 16
-        for i in range(0, 17-pad):
+        for _ in range(17-pad):
             rnd = '['
-            while rnd == '[' or rnd == ']' or rnd == '|':
+            while rnd in {'[', ']', '|'}:
                 rnd = chr(random.randint(20, 125))
             crypt += rnd
         now = datetime.datetime.utcnow()+datetime.timedelta(seconds=self.offset)
@@ -111,7 +111,7 @@ class dc09_msg:
         decryptor = cipher.decryptor()
         return decryptor.update(data) + decryptor.finalize()
 
-    def dc09block(self,  msg_nr=0,  dc09type="NULL",  msg="]"):   
+    def dc09block(self,  msg_nr=0,  dc09type="NULL",  msg="]"):
         """
         Construct a DC09 message block
         
@@ -131,21 +131,18 @@ class dc09_msg:
                 
                 the payload may be extended with the extra data constructed with dc09_extra
         """
-        if self.key is None:
-            ret = '"' + dc09type + '"'
-        else:
-            ret = '"*' + dc09type + '"'
+        ret = '"' + dc09type + '"' if self.key is None else '"*' + dc09type + '"'
         ret += '{0:04n}'.format(msg_nr)
         if self.receiver is not None:
             ret += 'R{0:X}'.format(self.receiver)
         if self.line is not None:
             ret += 'L{0:X}'.format(self.line)
-        ret += '#' + self.account + '['
+        ret += f'#{self.account}['
         if self.key is None:
             ret += msg
         else:
             if type != "NULL":
-                msg = '|' + msg
+                msg = f'|{msg}'
             ret += self.dc09crypt(msg).hex().upper()
         ret = '\n' + '{0:04X}'.format(self.dc09crc(ret)) + '{0:04X}'.format(len(ret)) + ret + '\r'
         return ret

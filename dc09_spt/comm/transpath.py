@@ -18,10 +18,7 @@ class TransPath:
         self.offset = 0
         self.timeout = timeout
         self.receiver = receiver
-        if type is not None:
-            self.type = type.lower()
-        else:
-            self.type = 'tcp'
+        self.type = type.lower() if type is not None else 'tcp'
         self.account = account
         self.key = key
         self.line = line

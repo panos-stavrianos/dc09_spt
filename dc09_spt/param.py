@@ -26,13 +26,12 @@ class param:
             if not isinstance(res, str):
                 res = str(res)
             if not res.isdigit():
-                raise Exception(name + ' is not numeric')
+                raise Exception(f'{name} is not numeric')
         return res
 
     @staticmethod
     def strpar(map,  name,  default=None):
         res = map.get(name, default)
-        if res is not None:
-            if not isinstance(res, str):
-                res = str(res)
+        if res is not None and not isinstance(res, str):
+            res = str(res)
         return res

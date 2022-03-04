@@ -74,7 +74,7 @@ class dc03_msg:
     The static method, dc03event, builds a DC03 message from a map with the various values.
     """
     @staticmethod
-    def dc03event(spt_account,  params={}):   
+    def dc03event(spt_account,  params={}):
         """
         Construct a DC03 message
         
@@ -117,36 +117,31 @@ class dc03_msg:
         zone = param.numpar(params, 'zone')
         user = param.numpar(params, 'user')
         msg = ''
-        if account is None:
-            msg += '#0000|'
-        else:
-            msg += '#' + account + '|'
+        msg += '#0000|' if account is None else f'#{account}|'
         code = param.strpar(params, 'code', None)
         text = param.strpar(params, 'text', None)
         flavor = param.strpar(params, 'flavor', None)
         if (code is None or code == 'A') and text is not None:
-            msg += 'A' + text
-            if zone is not None or area is not None or zone is not None or user is not None:
+            msg += f'A{text}'
+            if zone is not None or area is not None or user is not None:
                 logging.warning("Text message can not contain zone, area or user id's")
         else:
             msg += 'N'
             if code is None:
                 code = 'RP'
-            if area is not None:
-                if not dc03_codes.dc03_is_area(code):
-                    msg += 'ri' + area
-                    if 'areaname' in params:
-                        msg += '^' + params['areaname'] + '^'
-            if user is not None:
-                if not dc03_codes.dc03_is_user(code):
-                    msg += 'id' + user
-                    if 'username' in params:
-                        msg += '^' + params['username'] + '^'
+            if area is not None and not dc03_codes.dc03_is_area(code):
+                msg += f'ri{area}'
+                if 'areaname' in params:
+                    msg += '^' + params['areaname'] + '^'
+            if user is not None and not dc03_codes.dc03_is_user(code):
+                msg += f'id{user}'
+                if 'username' in params:
+                    msg += '^' + params['username'] + '^'
             if 'time' in params:
                 timep = params['time']
                 if timep == 'now':
                     timep = time.strftime('%H:%M:%S')
-                msg += 'ti' + timep
+                msg += f'ti{timep}'
             msg += code
             if dc03_codes.dc03_is_user(code):
                 if user is not None:
@@ -154,18 +149,13 @@ class dc03_msg:
                 if zone is not None:
                     logging.warning('Zone %s not included in message because code %s is user related',  zone,  code)
             elif dc03_codes.dc03_is_area(code) and area is not None:
-                if area is not None:
-                    msg += area
+                msg += area
                 if zone is not None:
                     logging.warning('Zone %s not included in message because code %s is area related',  zone,  code)
-            else:
-                if zone is not None:
-                    msg += zone
-                    if 'zonename' in params:
-                        msg += '^' + params['zonename'] + '^'
+            elif zone is not None:
+                msg += zone
+                if 'zonename' in params:
+                    msg += '^' + params['zonename'] + '^'
             if text is not None:
-                if flavor == 'xsia':
-                    msg += '*"' + text + '"NM'
-                else:
-                    msg += '|A' + text
-        return msg + ']'
+                msg += '*"' + text + '"NM' if flavor == 'xsia' else f'|A{text}'
+        return f'{msg}]'

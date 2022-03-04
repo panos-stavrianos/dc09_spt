@@ -42,7 +42,7 @@ class dc05_codes:
 
 class dc05_msg:
     @staticmethod
-    def dc05event(spt_account,  params={}):   
+    def dc05event(spt_account,  params={}):
         """
         Construct a DC05 message, also called Ademco Contact ID
         Parameters
@@ -74,25 +74,22 @@ class dc05_msg:
         zone = param.numpar(params, 'zone',  '000')
         user = param.numpar(params, 'user',  None)
         msg = ''
-        if account is None:
-            msg += '#0000|'
-        else:
-            msg += '#' + account + '|'
+        msg += '#0000|' if account is None else f'#{account}|'
         code = param.numpar(params,  'code',  '602')
         if len(code) != 3:
             raise Exception('Code should be 3 positions')
         q = param.numpar(params,  'q', '1')
-        if q != '1' and q != '3' and q != '3':
+        if q not in ['1', '3']:
             raise Exception('Qualifier q should be 1 or 3 or 6')
         area = param.numpar(params,  'area', '00')
         if len(area) != 2:
-            area = ('00' + area)[-2:]
+            area = f'00{area}'[-2:]
         if dc05_codes.dc05_is_user(code) and user is not None:
             if len(user) != 3:
-                user = ('000' + user)[-3:]
+                user = f'000{user}'[-3:]
             msg += q + code + ' ' + area + ' ' + user + ']'
         else:
             if len(zone) != 3:
-                zone = ('000' + zone)[-3:]
+                zone = f'000{zone}'[-3:]
             msg += q + code + ' ' + area + ' ' + zone + ']'
         return msg 

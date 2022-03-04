@@ -32,7 +32,7 @@ logger.setLevel(logging.DEBUG)
 """
 
 def callback(type, data):
-    print("Callback type " + type + " data :")
+    print(f"Callback type {type} data :")
     print(data)
 
 key1 = b"\x12\x34\x56\x78\x90\x12\x34\x56\x78\x90\x12\x34\x56\x78\x90\x12"
@@ -92,6 +92,6 @@ while action != '9':
     if action == '7':
         spt1.start_poll(85, 890)
         spt2.start_poll(850)
-    if action == '9' or action == '8':
+    if action in ['9', '8']:
         spt1.stop_poll()
         spt2.stop_poll()

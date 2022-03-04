@@ -46,7 +46,7 @@ class TransPathUDP:
         if self.s is not None:
             try:
                 self.s.settimeout(self.timeout / 5)
-                for x in range(5):
+                for _ in range(5):
                     try:
                         self.s.sendto(msg, (self.host, self.port))
                         antw,  sender = self.s.recvfrom(max_antw)
@@ -55,8 +55,6 @@ class TransPathUDP:
                     except Exception as e:
                         if e != TimeoutError:
                             raise
-                        else:
-                            pass
                     else:
                         break
             except Exception as e:
